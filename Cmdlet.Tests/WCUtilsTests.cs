@@ -234,5 +234,119 @@ namespace Cmdlet.Tests
         }
         #endregion
 
+        #region SKRegion-Op
+
+
+        [Fact]
+        public void Test_SetPath_Op()
+        {
+            // arrange
+            var path = new SKPath();
+            path.AddPoly(new SKPoint[] {
+                    new SKPoint() {X = 0, Y = 0},
+                    new SKPoint() {X = 0, Y = 2},
+                    new SKPoint() {X = 2, Y = 2},
+                    new SKPoint() {X = 2, Y = 0}
+                }
+            );
+            var region = new SKRegion();
+            region.SetPath(path);
+
+            var path2 = new SKPath();
+            path2.AddPoly(new SKPoint[] {
+                    new SKPoint() {X = 0, Y = 0},
+                    new SKPoint() {X = 0, Y = 1},
+                    new SKPoint() {X = 1, Y = 1},
+                    new SKPoint() {X = 1, Y = 0}
+                }
+            );
+
+            // act
+            region.Op(path2, SKRegionOperation.Replace);
+
+            // assert
+            Assert.Equal(0, region.Bounds.Left);
+            Assert.Equal(1, region.Bounds.Bottom);
+            Assert.Equal(1, region.Bounds.Right);
+            Assert.Equal(0, region.Bounds.Top);
+        }
+        #endregion
+
+        #region SKRegion-IntersectsPath
+        [Fact]
+        public void Test_IntersectsPath()
+        {
+            // arrange
+            var path = new SKPath();
+            path.AddPoly(new SKPoint[] {
+                    new SKPoint() {X = 0, Y = 0},
+                    new SKPoint() {X = 0, Y = 2},
+                    new SKPoint() {X = 2, Y = 2},
+                    new SKPoint() {X = 2, Y = 0}
+                }
+            );
+            var region = new SKRegion();
+            region.SetPath(path);
+
+            var path2 = new SKPath();
+            path2.AddPoly(new SKPoint[] {
+                    new SKPoint() {X = 1, Y = 1},
+                    new SKPoint() {X = 1, Y = 3},
+                    new SKPoint() {X = 3, Y = 3},
+                    new SKPoint() {X = 3, Y = 1}
+                }
+            );
+
+            // assert
+            Assert.True(region.IntersectsPath(path));
+        }
+
+        [Fact]
+        public void Test_IntersectsPath_DoesntIntersect()
+        {
+            // arrange
+            var region = new SKRegion();
+
+            var path = new SKPath();
+            path.AddPoly(new SKPoint[] {
+                    new SKPoint() {X = 0, Y = 0},
+                    new SKPoint() {X = 0, Y = 3},
+                    new SKPoint() {X = 3, Y = 3},
+                    new SKPoint() {X = 3, Y = 0}
+                }
+            );
+
+            var path2 = new SKPath();
+            path2.AddPoly(new SKPoint[] {
+                    new SKPoint() {X = 1, Y = 1},
+                    new SKPoint() {X = 1, Y = 2},
+                    new SKPoint() {X = 2, Y = 2},
+                    new SKPoint() {X = 2, Y = 1}
+                }
+            );
+
+            // assert
+            Assert.False(region.IntersectsPath(path));
+        }
+
+        [Fact]
+        public void Test_IntersectsPath_EmptyRegion()
+        {
+            // arrange
+            var region = new SKRegion();
+
+            var path = new SKPath();
+            path.AddPoly(new SKPoint[] {
+                    new SKPoint() {X = 0, Y = 0},
+                    new SKPoint() {X = 0, Y = 2},
+                    new SKPoint() {X = 2, Y = 2},
+                    new SKPoint() {X = 2, Y = 0}
+                }
+            );
+
+            // assert
+            Assert.False(region.IntersectsPath(path));
+        }
+        #endregion
     }
 }

@@ -57,12 +57,7 @@ namespace PSWordCloud
             {
                 pathRegion.SetPath(path, region);
 
-                if (region.Intersects(pathRegion))
-                {
-                    return true;
-                }
-
-                return false;
+                return region.Intersects(pathRegion);
             }
         }
 
