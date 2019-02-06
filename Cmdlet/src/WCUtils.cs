@@ -21,6 +21,15 @@ namespace PSWordCloud
     {
         public static float ToRadians(this float degrees) => (float)(degrees * Math.PI / 180);
 
+        public static void NextWord(this SKPaint brush, float wordSize, float strokeWidth, SKColor color)
+        {
+            brush.TextSize = wordSize;
+            brush.StrokeWidth = strokeWidth == 0 ? 0 : wordSize * strokeWidth / 100;
+            brush.IsStroke = false;
+            brush.IsVerticalText = false;
+            brush.Color = color;
+        }
+
         public static bool SetPath(this SKRegion region, SKPath path, bool usePathBounds)
         {
             if (usePathBounds && path.GetBounds(out SKRect bounds))
@@ -64,7 +73,10 @@ namespace PSWordCloud
         internal static readonly ReadOnlyDictionary<string, SKColor> ColorLibrary =
             new ReadOnlyDictionary<string, SKColor>(typeof(SKColors)
             .GetFields(BindingFlags.Static | BindingFlags.Public)
-            .ToDictionary((field => field.Name), (field => (SKColor)field.GetValue(null))));
+            .ToDictionary(
+                (field => field.Name),
+                (field => (SKColor)field.GetValue(null)),
+                StringComparer.OrdinalIgnoreCase));
 
         internal static readonly IEnumerable<string> ColorNames = ColorLibrary.Keys;
 
