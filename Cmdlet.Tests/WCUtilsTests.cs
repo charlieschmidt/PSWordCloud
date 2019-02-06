@@ -33,6 +33,7 @@ namespace Cmdlet.Tests
         [Theory]
         [InlineData("notacolor")]
         [InlineData("")]
+        [InlineData("red")]
         public void Test_GetColorByName_InvalidName(string colorName) {
             Assert.Throws<System.Collections.Generic.KeyNotFoundException>(() => WCUtils.GetColorByName(colorName));
         }
@@ -48,7 +49,7 @@ namespace Cmdlet.Tests
         public void Test_GetValue_FromPSMemberInfoCollection()
         {
             // arrange
-            var col = new PSMemberInfoCollection<PSPropertyInfo>();
+            //var col = new PSMemberInfoCollection<PSPropertyInfo>();
         }
     }
 }
