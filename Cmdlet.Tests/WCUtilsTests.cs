@@ -4,11 +4,14 @@ using PSWordCloud;
 using System.Management.Automation;
 using System.Collections;
 using System.Collections.Generic;
+using SkiaSharp;
 
 namespace Cmdlet.Tests
 {
     public class WCUtilsTests
     {
+
+        #region float-ToRadians
         [Theory]
         [InlineData(0.0, 0.0)]
         [InlineData((float)Math.PI, 180.0)]
@@ -17,7 +20,9 @@ namespace Cmdlet.Tests
         {
             Assert.Equal(expected, degrees.ToRadians());
         }
+        #endregion
 
+        #region GetColorByName
         [Theory]
         [InlineData("Red", 0xff, 0x00, 0x00)]
         [InlineData("Blue", 0x00, 0x00, 0xff)]
@@ -46,8 +51,9 @@ namespace Cmdlet.Tests
         {
             Assert.Throws<System.ArgumentNullException>(() => WCUtils.GetColorByName(null));
         }
+        #endregion
 
-
+        #region IEnumerable-GetValue
         [Fact]
         public void Test_GetValue_FromSimpleDictionary()
         {
@@ -85,7 +91,7 @@ namespace Cmdlet.Tests
         public void Test_GetValue_FromDynamicDictionary()
         {
             // arrange
-            var dict = new Dictionary<string, dynamic>() { { "a", new { ThisKey = 2} }, { "b", new { ThatKey = 3 } } };
+            var dict = new Dictionary<string, dynamic>() { { "a", new { ThisKey = 2 } }, { "b", new { ThatKey = 3 } } };
 
             // act
             dynamic a = dict.GetValue("a");
@@ -123,8 +129,110 @@ namespace Cmdlet.Tests
         {
             // assert
             Assert.Throws<System.ArgumentException>(() => ((IEnumerable)null).GetValue("a"));
-            Assert.Throws<System.ArgumentException>(() => ((IDictionary<string,object>)null).GetValue("a"));
+            Assert.Throws<System.ArgumentException>(() => ((IDictionary<string, object>)null).GetValue("a"));
         }
+        #endregion
+
+        #region SKRegion-SetPath
+
+        [Fact]
+        public void Test_SetPath()
+        {
+            // arrange
+            var path = new SKPath();
+            path.AddPoly(new SKPoint[] {
+                    new SKPoint() {X = 0, Y = 0},
+                    new SKPoint() {X = 0, Y = 1},
+                    new SKPoint() {X = 1, Y = 1},
+                    new SKPoint() {X = 1, Y = 0}
+                }
+            );
+            var region = new SKRegion();
+            
+            // act
+            region.SetPath(path, false);
+
+            // assert
+            Assert.Equal(0, region.Bounds.Left);
+            Assert.Equal(1, region.Bounds.Bottom);
+            Assert.Equal(1, region.Bounds.Right);
+            Assert.Equal(0, region.Bounds.Top);
+        }
+
+        [Fact]
+        public void Test_SetPath_UseBounds()
+        {
+            // arrange
+            var path = new SKPath();
+            path.AddPoly(new SKPoint[] {
+                    new SKPoint() {X = 0, Y = 0},
+                    new SKPoint() {X = 0, Y = 2},
+                    new SKPoint() {X = 2, Y = 2},
+                    new SKPoint() {X = 2, Y = 0}
+                }
+            );
+            var region = new SKRegion();
+            region.SetPath(path);
+
+            var path2 = new SKPath();
+            path2.AddPoly(new SKPoint[] {
+                    new SKPoint() {X = 0, Y = 0},
+                    new SKPoint() {X = 0, Y = 1},
+                    new SKPoint() {X = 1, Y = 1},
+                    new SKPoint() {X = 1, Y = 0}
+                }
+            );
+
+            // act
+            region.SetPath(path2, false);
+
+            // assert
+            Assert.Equal(0, region.Bounds.Left);
+            Assert.Equal(1, region.Bounds.Bottom);
+            Assert.Equal(1, region.Bounds.Right);
+            Assert.Equal(0, region.Bounds.Top);
+        }
+
+        [Fact]
+        public void Test_SetPath_UnclosedPath()
+        {
+            // arrange
+            var path = new SKPath();
+            path.AddPoly(new SKPoint[] {
+                    new SKPoint() {X = 0, Y = 0},
+                    new SKPoint() {X = 0, Y = 1},
+                    new SKPoint() {X = 1, Y = 1}
+                }
+            );
+            var region = new SKRegion();
+
+            // act
+            region.SetPath(path, true);
+
+            // assert
+            Assert.Equal(0, region.Bounds.Left);
+            Assert.Equal(1, region.Bounds.Bottom);
+            Assert.Equal(1, region.Bounds.Right);
+            Assert.Equal(0, region.Bounds.Top);
+        }
+
+        [Fact]
+        public void Test_SetPath_EmptyPath()
+        {
+            // arrange
+            var path = new SKPath();
+            var region = new SKRegion();
+
+            // act
+            region.SetPath(path, true);
+
+            // assert
+            Assert.Equal(0, region.Bounds.Left);
+            Assert.Equal(0, region.Bounds.Bottom);
+            Assert.Equal(0, region.Bounds.Right);
+            Assert.Equal(0, region.Bounds.Top);
+        }
+        #endregion
 
     }
 }
