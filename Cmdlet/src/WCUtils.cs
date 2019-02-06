@@ -83,10 +83,18 @@ namespace PSWordCloud
             {
                 case PSMemberInfoCollection<PSPropertyInfo> properties:
                     return properties[key].Value;
-                case IDictionary dictionary:
-                    return dictionary[key];
                 case IDictionary<string, dynamic> dictT:
                     return dictT[key];
+                case IDictionary dictionary:
+                    {
+                        var keys = dictionary.Keys as ICollection<string>;
+
+                        if (keys == null) {
+                            throw new ArgumentException("GetValue method only accepts dictionary with string keys");
+                        }
+
+                        return dictionary[key];
+                    }
                 default:
                     throw new ArgumentException(
                         string.Format(
