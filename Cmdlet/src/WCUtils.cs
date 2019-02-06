@@ -24,7 +24,7 @@ namespace PSWordCloud
         public static void NextWord(this SKPaint brush, float wordSize, float strokeWidth, SKColor color)
         {
             brush.TextSize = wordSize;
-            brush.StrokeWidth = strokeWidth == 0 ? 0 : wordSize * strokeWidth / 100;
+            brush.StrokeWidth = wordSize * strokeWidth / (float)100.0;
             brush.IsStroke = false;
             brush.IsVerticalText = false;
             brush.Color = color;

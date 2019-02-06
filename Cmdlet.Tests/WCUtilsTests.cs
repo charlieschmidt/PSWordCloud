@@ -22,6 +22,47 @@ namespace Cmdlet.Tests
         }
         #endregion
 
+        #region SKPaint-NextWord
+
+        [Fact]
+        public void Test_NextWord()
+        {
+            // arrange
+            var brush = new SKPaint();
+
+            // act
+            brush.NextWord((float)10.0, (float)15.0, WCUtils.GetColorByName("Red"));
+
+            // assert
+            Assert.Equal(10.0, brush.TextSize);
+            Assert.Equal(1.5, brush.StrokeWidth);
+            Assert.False(brush.IsStroke);
+            Assert.False(brush.IsVerticalText);
+            Assert.Equal(0xff, brush.Color.Red);
+            Assert.Equal(0x00, brush.Color.Blue);
+            Assert.Equal(0x00, brush.Color.Green);
+        }
+
+        [Fact]
+        public void Test_NextWord_ZeroStrokWidth()
+        {
+            // arrange
+            var brush = new SKPaint();
+
+            // act
+            brush.NextWord((float)10.0, (float)0.0, WCUtils.GetColorByName("Red"));
+
+            // assert
+            Assert.Equal(10.0, brush.TextSize);
+            Assert.Equal(0.0, brush.StrokeWidth);
+            Assert.False(brush.IsStroke);
+            Assert.False(brush.IsVerticalText);
+            Assert.Equal(0xff, brush.Color.Red);
+            Assert.Equal(0x00, brush.Color.Blue);
+            Assert.Equal(0x00, brush.Color.Green);
+        }
+        #endregion
+
         #region GetColorByName
         [Theory]
         [InlineData("Red", 0xff, 0x00, 0x00)]
@@ -148,7 +189,7 @@ namespace Cmdlet.Tests
                 }
             );
             var region = new SKRegion();
-            
+
             // act
             region.SetPath(path, false);
 
