@@ -26,6 +26,7 @@ namespace Cmdlet.Tests
         [Theory]
         [InlineData("Red", 0xff, 0x00, 0x00)]
         [InlineData("Blue", 0x00, 0x00, 0xff)]
+        [InlineData("red", 0xff, 0x00, 0x00)]
         public void Test_GetColorByName(string colorName, byte red, byte green, byte blue)
         {
             // act
@@ -40,7 +41,6 @@ namespace Cmdlet.Tests
         [Theory]
         [InlineData("notacolor")]
         [InlineData("")]
-        [InlineData("red")]
         public void Test_GetColorByName_InvalidName(string colorName)
         {
             Assert.Throws<System.Collections.Generic.KeyNotFoundException>(() => WCUtils.GetColorByName(colorName));
