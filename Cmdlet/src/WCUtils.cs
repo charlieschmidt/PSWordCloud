@@ -19,10 +19,7 @@ namespace PSWordCloud
 
     internal static class WCUtils
     {
-        public static float ToRadians(this float degrees)
-        {
-            return (float)(degrees * Math.PI / 180);
-        }
+        public static float ToRadians(this float degrees) => (float)(degrees * Math.PI / 180);
 
         public static bool SetPath(this SKRegion region, SKPath path, bool usePathBounds)
         {
@@ -78,10 +75,7 @@ namespace PSWordCloud
 
         internal static readonly IEnumerable<SKColor> StandardColors = ColorLibrary.Values;
 
-        internal static SKColor GetColorByName(string colorName)
-        {
-            return ColorLibrary[colorName];
-        }
+        internal static SKColor GetColorByName(string colorName) => ColorLibrary[colorName];
 
         internal static object GetValue(this IEnumerable collection, string key)
         {

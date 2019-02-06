@@ -5,10 +5,10 @@
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-<ItemGroup>
-  <ProjectReference Include="..\Cmdlet\PSWordCloudCmdlet.csproj" />
+  <ItemGroup>
+    <ProjectReference Include="..\Cmdlet\PSWordCloudCmdlet.csproj" />
 
-</ItemGroup>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
@@ -16,8 +16,10 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
     <PackageReference Include="coverlet.msbuild" Version="2.0.1" />
+    <DotNetCliToolReference Include="dotnet-reportgenerator-cli" Version="4.0.10.0" />
 
-  <DotNetCliToolReference Include="dotnet-reportgenerator-cli" Version="4.0.10.0" />
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.0" PrivateAssets="All"/>
+
   </ItemGroup>
 
 </Project>
