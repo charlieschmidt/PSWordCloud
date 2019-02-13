@@ -90,13 +90,27 @@ namespace PSWordCloud
             {
                 case PSMemberInfoCollection<PSPropertyInfo> properties:
                     return properties[key].Value;
+                    PSPropertyInfo pi = properties[key];
+                    if (pi == null)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        return pi.Value;
+                    }
                 case IDictionary<string, dynamic> dictT:
-                    return dictT[key];
+                    if (dictT.TryGetValue(key, out dynamic ret))
+                    {
+                        return ret;
+                    }
+                    return null;
                 case IDictionary dictionary:
                     {
                         var keys = dictionary.Keys as ICollection<string>;
 
-                        if (keys == null) {
+                        if (keys == null)
+                        {
                             throw new ArgumentException("GetValue method only accepts dictionary with string keys");
                         }
 
@@ -110,20 +124,5 @@ namespace PSWordCloud
                             typeof(IDictionary).ToString()));
             }
         }
-
-        internal static SKFontManager FontManager = SKFontManager.CreateDefault();
-
-        internal static ReadOnlyDictionary<string, (string Tooltip, SKSizeI Size)> StandardImageSizes =
-            new ReadOnlyDictionary<string, (string, SKSizeI)>(new Dictionary<string, (string, SKSizeI)>() {
-                {"480x800",     ("Mobile Screen Size (small)",  new SKSizeI(480, 800)  )},
-                {"640x1146",    ("Mobile Screen Size (medium)", new SKSizeI(640, 1146) )},
-                {"720p",        ("Standard HD 1280x720",        new SKSizeI(1280, 720) )},
-                {"1080p",       ("Full HD 1920x1080",           new SKSizeI(1920, 1080))},
-                {"4K",          ("Ultra HD 3840x2160",          new SKSizeI(3840, 2160))},
-                {"A4",          ("816x1056",                    new SKSizeI(816, 1056) )},
-                {"Poster11x17", ("1056x1632",                   new SKSizeI(1056, 1632))},
-                {"Poster18x24", ("1728x2304",                   new SKSizeI(1728, 2304))},
-                {"Poster24x36", ("2304x3456",                   new SKSizeI(2304, 3456))},
-            });
     }
 }

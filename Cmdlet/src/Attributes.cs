@@ -13,6 +13,19 @@ namespace PSWordCloud
 {
     public class ImageSizeCompleter : IArgumentCompleter
     {
+        internal static ReadOnlyDictionary<string, (string Tooltip, SKSizeI Size)> StandardImageSizes =
+       new ReadOnlyDictionary<string, (string, SKSizeI)>(new Dictionary<string, (string, SKSizeI)>() {
+                {"480x800",     ("Mobile Screen Size (small)",  new SKSizeI(480, 800)  )},
+                {"640x1146",    ("Mobile Screen Size (medium)", new SKSizeI(640, 1146) )},
+                {"720p",        ("Standard HD 1280x720",        new SKSizeI(1280, 720) )},
+                {"1080p",       ("Full HD 1920x1080",           new SKSizeI(1920, 1080))},
+                {"4K",          ("Ultra HD 3840x2160",          new SKSizeI(3840, 2160))},
+                {"A4",          ("816x1056",                    new SKSizeI(816, 1056) )},
+                {"Poster11x17", ("1056x1632",                   new SKSizeI(1056, 1632))},
+                {"Poster18x24", ("1728x2304",                   new SKSizeI(1728, 2304))},
+                {"Poster24x36", ("2304x3456",                   new SKSizeI(2304, 3456))},
+       });
+
         public IEnumerable<CompletionResult> CompleteArgument(
             string commandName,
             string parameterName,
@@ -20,7 +33,7 @@ namespace PSWordCloud
             CommandAst commandAst,
             IDictionary fakeboundParameters)
         {
-            foreach (var result in WCUtils.StandardImageSizes)
+            foreach (var result in StandardImageSizes)
             {
                 if (string.IsNullOrEmpty(wordToComplete) ||
                     result.Key.StartsWith(wordToComplete, StringComparison.OrdinalIgnoreCase))
@@ -92,9 +105,9 @@ namespace PSWordCloud
                     }
                     break;
                 case string s:
-                    if (WCUtils.StandardImageSizes.ContainsKey(s))
+                    if (ImageSizeCompleter.StandardImageSizes.ContainsKey(s))
                     {
-                        return WCUtils.StandardImageSizes[s].Size;
+                        return ImageSizeCompleter.StandardImageSizes[s].Size;
                     }
                     else
                     {
@@ -157,6 +170,8 @@ namespace PSWordCloud
 
     public class FontFamilyCompleter : IArgumentCompleter
     {
+        internal static SKFontManager FontManager = SKFontManager.CreateDefault();
+        
         public IEnumerable<CompletionResult> CompleteArgument(
             string commandName,
             string parameterName,
@@ -164,13 +179,13 @@ namespace PSWordCloud
             CommandAst commandAst,
             IDictionary fakeBoundParameters)
         {
-            var fontList = WCUtils.FontManager.FontFamilies;
+            var fontList = FontManager.FontFamilies;
             foreach (string font in fontList)
             {
                 if (string.IsNullOrEmpty(wordToComplete) ||
                     font.StartsWith(wordToComplete, StringComparison.OrdinalIgnoreCase))
                 {
-                    yield return new CompletionResult(font, font, CompletionResultType.ParameterName, string.Empty);
+                    yield return new CompletionResult(font, font, CompletionResultType.ParameterName, font);
                 }
             }
         }
@@ -185,8 +200,9 @@ namespace PSWordCloud
                 case SKTypeface t:
                     return t;
                 case string s:
-                    return WCUtils.FontManager.MatchFamily(s, SKFontStyle.Normal);
+                    return FontFamilyCompleter.FontManager.MatchFamily(s, SKFontStyle.Normal);
                 default:
+                Console.WriteLine("how are we here?");
                     IEnumerable properties = null;
                     if (inputData is Hashtable ht)
                     {
@@ -197,18 +213,27 @@ namespace PSWordCloud
                         properties = PSObject.AsPSObject(inputData).Properties;
                     }
 
+                    Console.WriteLine("1");
+                    Console.WriteLine($"{properties}");
                     SKFontStyleWeight weight = properties.GetValue("FontWeight") == null ?
                         SKFontStyleWeight.Normal : LanguagePrimitives.ConvertTo<SKFontStyleWeight>(
                             properties.GetValue("FontWeight"));
+
+                    Console.WriteLine("2");
                     SKFontStyleSlant slant = properties.GetValue("FontSlant") == null ?
                         SKFontStyleSlant.Upright : LanguagePrimitives.ConvertTo<SKFontStyleSlant>(
                             properties.GetValue("FontSlant"));
+
+                    Console.WriteLine("3");
                     SKFontStyleWidth width = properties.GetValue("FontWidth") == null ?
                         SKFontStyleWidth.Normal : LanguagePrimitives.ConvertTo<SKFontStyleWidth>(
                             properties.GetValue("FontWidth"));
+
+                    Console.WriteLine("4");
                     string familyName = LanguagePrimitives.ConvertTo<string>(properties.GetValue("FamilyName"));
 
-                    return WCUtils.FontManager.MatchFamily(familyName, new SKFontStyle(weight, width, slant));
+                    Console.WriteLine("5");
+                    return FontFamilyCompleter.FontManager.MatchFamily(familyName, new SKFontStyle(weight, width, slant));
             }
         }
     }

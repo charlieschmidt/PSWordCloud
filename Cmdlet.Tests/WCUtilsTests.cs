@@ -95,6 +95,29 @@ namespace Cmdlet.Tests
         #endregion
 
         #region IEnumerable-GetValue
+
+        [Fact]
+        public void Test_GetValue_FromPSMemberInfoCollection()
+        {
+            // arrange
+            var dict = new Dictionary<string, object>() { { "a", "1" }, { "b", "2" } };
+            var properties = PSObject.AsPSObject(dict).Properties;
+Console.WriteLine($"{properties["a"]}");
+            foreach (var prop in properties) {
+                Console.WriteLine($"prop is \n{prop}\n\nthing");
+                //foreach (var k in prop.Keys) {
+
+                //Console.WriteLine($"{k} = {prop[k]}");
+
+                //}    
+            }
+            // assert
+            Assert.Equal("1", properties.GetValue("a"));
+            Assert.Equal("2", properties.GetValue("b"));
+            Assert.Null(properties.GetValue("keynotfound"));
+            Assert.Null(properties.GetValue(""));
+        }
+
         [Fact]
         public void Test_GetValue_FromSimpleDictionary()
         {

@@ -53,7 +53,7 @@ namespace PSWordCloud
         [Alias("FontFamily", "FontFace")]
         [ArgumentCompleter(typeof(FontFamilyCompleter))]
         [TransformToSKTypeface]
-        public SKTypeface Typeface { get; set; } = WCUtils.FontManager.MatchFamily(
+        public SKTypeface Typeface { get; set; } = FontFamilyCompleter.FontManager.MatchFamily(
             "Consolas", SKFontStyle.Normal);
 
         [Parameter]
