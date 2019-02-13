@@ -5,8 +5,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Management.Automation;
 using System.Reflection;
-using SkiaSharp;
 using System.Runtime.CompilerServices;
+using SkiaSharp;
 
 [assembly: InternalsVisibleTo("Cmdlet.Tests")]
 namespace PSWordCloud
@@ -14,20 +14,61 @@ namespace PSWordCloud
     internal enum WordOrientation : sbyte
     {
         Horizontal,
-        Vertical
+        Vertical,
+        FlippedVertical,
     }
 
     internal static class WCUtils
     {
         public static float ToRadians(this float degrees) => (float)(degrees * Math.PI / 180);
+        public static SKPoint Multiply(this SKPoint point, float factor)
+            => new SKPoint(point.X * factor, point.Y * factor);
+
+        public static void Shuffle<T>(this Random rng, T[] array)
+        {
+            int n = array.Length;
+            while (n > 1)
+            {
+                int k = rng.Next(n--);
+                T temp = array[n];
+                array[n] = array[k];
+                array[k] = temp;
+            }
+        }
+
+        /// <summary>
+        /// Checks if any part of the rectangle lies outside the region's bounds.
+        /// </summary>
+        /// <param name="region">The region to test for edge intersection.</param>
+        /// <param name="other">The rectangle to test position against the edges of the region.</param>
+        /// <returns>Returns false if the rectangle is entirely within the region, and false otherwise.</returns>
+        public static bool FallsOutside(this SKRect other, SKRegion region)
+        {
+            var bounds = region.Bounds;
+            return other.Top < bounds.Top
+                || other.Bottom > bounds.Bottom
+                || other.Left < bounds.Left
+                || other.Right > bounds.Right;
+        }
+
+        public static void NextWord(this SKPaint brush, float wordSize, float strokeWidth)
+            => brush.NextWord(wordSize, strokeWidth, SKColors.Black);
 
         public static void NextWord(this SKPaint brush, float wordSize, float strokeWidth, SKColor color)
         {
             brush.TextSize = wordSize;
-            brush.StrokeWidth = wordSize * strokeWidth / (float)100.0;
             brush.IsStroke = false;
+            brush.Style = SKPaintStyle.StrokeAndFill;
+            brush.StrokeWidth = wordSize * strokeWidth * NewWordCloudCommand.STROKE_BASE_SCALE;
             brush.IsVerticalText = false;
             brush.Color = color;
+        }
+
+        public static float SortValue(this SKColor color, float sortAdjustment)
+        {
+            color.ToHsv(out float h, out float saturation, out float brightness);
+            var rand = brightness * (sortAdjustment - 0.5f) / (1 - saturation);
+            return brightness + rand;
         }
 
         public static bool SetPath(this SKRegion region, SKPath path, bool usePathBounds)
@@ -55,6 +96,20 @@ namespace PSWordCloud
             }
         }
 
+        public static bool IntersectsRect(this SKRegion region, SKRect rect)
+        {
+            if (region.Bounds.IsEmpty)
+            {
+                return false;
+            }
+
+            using (SKRegion rectRegion = new SKRegion())
+            {
+                rectRegion.SetRect(SKRectI.Round(rect));
+                return region.Intersects(rectRegion);
+            }
+        }
+
         public static bool IntersectsPath(this SKRegion region, SKPath path)
         {
             if (region.Bounds.IsEmpty)
@@ -65,7 +120,6 @@ namespace PSWordCloud
             using (SKRegion pathRegion = new SKRegion())
             {
                 pathRegion.SetPath(path, region);
-
                 return region.Intersects(pathRegion);
             }
         }
